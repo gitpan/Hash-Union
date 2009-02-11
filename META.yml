@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Hash-Union
-version:            0.02
+version:            0.03
 abstract:           smart hashes merging
 author:
     - Oleg A. Mamontov <oleg@mamontov.net>

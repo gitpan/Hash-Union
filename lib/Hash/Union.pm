@@ -9,17 +9,63 @@ Hash::Union - smart hashes merging
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
-use Hash::Union 'union';
+  use Hash::Union 'union';
+  use Data::Dumper;                # for debug only
 
-my $result = union( [ \%hash1, ... ] );
+  my $config_base = {              # default application config
+      'database' => 'production',  # production database
+      'html_dirs' => [             # search paths for html documents
+          '/docs/html/main',
+          '/docs/html/default'
+      ],
+      'text_dirs' => [             # search paths fo text documents
+          '/docs/text/main',
+          '/docs/text/default'
+      ]
+  };
+
+  my $config_local = {             # locally customized config
+      'database' => 'stageing',    # devel database
+      'prepend: html_dirs' => [    # local html pages preferred
+          '/local/html/main',
+          '/local/html/default'
+      ],
+      'append: text_dirs' => [     # fallback for nonexistent text
+          '/local/text/main',
+          '/local/text/default'
+      ]
+  };
+
+  # now merge default with local
+  my $config = union( [ $config_base, $config_local ] );
+
+  print Dumper $config;
+
+  ========
+
+  $VAR1 = {
+      'database' => 'stageing',
+      'html_dirs' => [
+          '/local/html/main',
+          '/local/html/default',
+          '/docs/html/main',
+          '/docs/html/default'
+      ],
+      'text_dirs' => [
+          '/docs/text/main',
+          '/docs/text/default',
+          '/local/text/main',
+          '/local/text/default'
+      ]
+  };
 
 =cut
 
@@ -35,11 +81,11 @@ Supported options:
 
 =over
 
-=item * B<reverse>
+=item * reverse
 
 Merge all hash references in reverse order.
 
-=item * B<simple>
+=item * simple
 
 Don't apply complex merging logic (ignore keys special meaning).
 
@@ -214,7 +260,7 @@ __END__
 
 =over
 
-=item B<Setting new value unconditionally:>
+=item Setting new value unconditionally:
 
 Key syntax: '=KEY', '= KEY', 'set:KEY', 'set: KEY'
 
@@ -222,21 +268,21 @@ Previous value of KEY will be lost and new value will be set unconditionally.
 This kind of merging logic applies to any 'plain' keys by default. Passed option 'simple'
 forces this method for 'complex' keys too.
 
-=item B<Setting new value only if no true value still exists:>
+=item Setting new value only if no true value still exists:
 
 Key syntax: '?=KEY', '?= KEY' , 'ifnone:KEY', 'ifnone: KEY'
 
 If C<true> (from perl point of view) value for this key exists just skip new value assignment.
 Otherwise assign new value (possible even C<false>).
 
-=item B<Prepending new value to existing:>
+=item Prepending new value to existing:
 
 Key syntax: '+=KEY', '+= KEY', 'prepend:KEY', 'prepend: KEY'
 
 Prepend new value to any existing value of key. Raise an exception on an incompatible value types.
 Scalars will be concatenated, arrays unshifted, hashes traversed deeply in proper order.
 
-=item B<Appending new value to existing:>
+=item Appending new value to existing:
 
 Key syntax: '=+KEY', '=+ KEY', 'append:KEY', 'append: KEY'
 

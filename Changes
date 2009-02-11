@@ -6,3 +6,7 @@ Revision history for Hash-Union
 0.02    2009-02-09
         Prepared to CPAN uploading
 
+0.03    2009-02-10
+        1. Fixed minimum Perl vrsion requirement (cause constant.pm)
+        2. Synopsis enhancement
+
